@@ -1,0 +1,17 @@
+{
+  "name": "evora",
+  "version": "1.0.0",
+  "description": "EVora - AI-Powered EV Recommendation & Intelligence Platform",
+  "private": true,
+  "scripts": {
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "seed": "npm --prefix server run seed",
+    "verify-db": "npm --prefix server run verify-db",
+    "check-rs": "npm --prefix server run check-rs",
+    "init-rs": "npm --prefix server run init-rs",
+    "build:client": "npm --prefix client run build"
+  },
+  "keywords": ["ev", "electric-vehicle", "recommendation-system", "mern", "mongodb", "gemini-ai"],
+  "author": "Kuntali Jagtap"
+}
