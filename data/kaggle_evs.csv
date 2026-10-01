@@ -1,0 +1,23 @@
+Brand,Model,Variant,BodyStyle,Battery_Capacity_kWh,Claimed_Range_km,Power_bhp,Torque_Nm,Top_Speed_kmph,AccelSec,Seats,Fast_Charging_Mins,Price_INR,ImageUrl
+Tata,Nexon EV,Empowered Plus LR,SUV,45.0,489,143,215,150,8.9,5,40,1929000,https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1000&q=80
+Tata,Punch EV,Empowered Plus S,SUV,35.0,421,120,190,140,9.5,5,56,1329000,https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=1000&q=80
+Tata,Tiago EV,XZ Plus Tech Lux,Hatchback,24.0,315,74,114,120,12.0,5,58,1099000,https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1000&q=80
+Tata,Curvv EV,Empowered Plus A 55,Crossover,55.0,585,165,215,160,8.6,5,40,2199000,https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=80
+Tata,Tigor EV,XZ Plus,Sedan,26.0,315,74,170,120,12.5,5,60,1249000,https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=80
+MG,Windsor EV,Essence,Crossover,38.0,332,134,200,145,9.8,5,40,1549000,https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=80
+MG,ZS EV,Exclusive Plus,SUV,50.3,461,174,280,175,8.5,5,42,2499000,https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1000&q=80
+MG,Comet EV,Plush,Hatchback,17.3,230,41,110,100,15.0,4,65,899000,https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1000&q=80
+Mahindra,XUV400,EL Pro 39.4,SUV,39.4,456,148,310,150,8.3,5,50,1749000,https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1000&q=80
+Mahindra,BE 6e,Pack 1,SUV,59.0,557,228,380,180,6.7,5,20,1890000,https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1000&q=80
+Hyundai,Ioniq 5,RWD,Crossover,72.6,631,215,350,185,7.6,5,18,4605000,https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1000&q=80
+Hyundai,Creta EV,Exceed LR,SUV,51.4,473,169,255,165,7.9,5,45,2150000,https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1000&q=80
+Hyundai,Kona Electric,Premium,SUV,39.2,452,134,395,167,9.7,5,57,2384000,https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1000&q=80
+BYD,Atto 3,Superior,SUV,60.48,521,201,310,160,7.3,5,50,3399000,https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&w=1000&q=80
+BYD,Seal,Performance AWD,Sedan,82.56,580,523,670,200,3.8,5,37,5300000,https://images.unsplash.com/photo-1541348263662-e0c86666ecb7?auto=format&fit=crop&w=1000&q=80
+BYD,eMAX 7,Superior 7S,MUV,71.8,530,201,310,170,8.6,7,45,2990000,https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=80
+Kia,EV6,GT Line AWD,Crossover,77.4,708,320,605,192,5.2,5,18,6595000,https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1000&q=80
+BMW,i4,eDrive40,Sedan,83.9,590,335,430,190,5.7,5,31,7250000,https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1000&q=80
+BMW,iX1,xDrive30,SUV,66.4,440,308,494,180,5.6,5,29,6690000,https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1000&q=80
+Volvo,EX40,Recharge Plus,SUV,69.0,475,235,420,180,7.3,5,34,5610000,https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1000&q=80
+Mercedes-Benz,EQB,350 4MATIC,SUV,66.5,423,288,520,160,6.2,7,32,7750000,https://images.unsplash.com/photo-1541348263662-e0c86666ecb7?auto=format&fit=crop&w=1000&q=80
+Citroen,eC3,Shine,Hatchback,29.2,320,56,143,107,15.5,5,57,1180000,https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1000&q=80
