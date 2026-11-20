@@ -6,6 +6,11 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/authRoutes.js';
 import evRoutes from './routes/evRoutes.js';
 import brandRoutes from './routes/brandRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
+import statsRoutes from './routes/statsRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -47,7 +52,12 @@ app.get('/api/health', (req, res) => {
 // Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/evs', evRoutes);
+app.use('/api/evs', reviewRoutes);
 app.use('/api/brands', brandRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/advisor', aiRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 Route Not Found
 app.use('*', (req, res) => {

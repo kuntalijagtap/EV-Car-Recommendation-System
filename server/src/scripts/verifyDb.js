@@ -64,8 +64,8 @@ async function verifyDatabase() {
     console.log(`- ownership_claims:   ${claimCount}`);
 
     // Flagship count
-    const flagshipCount = await EV.countDocuments({ has360Model: true });
-    console.log(`- Flagship 360 EVs:   ${flagshipCount} (Strict requirement: 5-6 models)\n`);
+    const vehiclesWith360Frames = await EV.countDocuments({ 'view360Frames.1': { $exists: true } });
+    console.log(`- EVs with genuine 360° image frames: ${vehiclesWith360Frames}\n`);
 
     // 2. Verify Aggregations
     console.log('----------------------------------------------------');

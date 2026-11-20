@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
+import { getJwtSecret } from '../config/jwt.js';
 
 /**
  * Protect routes - Verifies JWT from Authorization header
@@ -24,7 +25,7 @@ export async function protect(req, res, next) {
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'evora_jwt_secret_dev_super_safe_key_2026'
+      getJwtSecret()
     );
     const user = await User.findById(decoded.id).select('-password');
 
@@ -80,7 +81,7 @@ export async function optionalAuth(req, res, next) {
   try {
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET || 'evora_jwt_secret_dev_super_safe_key_2026'
+      getJwtSecret()
     );
     req.user = await User.findById(decoded.id).select('-password');
   } catch {

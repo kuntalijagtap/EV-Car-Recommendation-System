@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
+import { getJwtSecret } from '../config/jwt.js';
 
 function generateToken(id) {
   return jwt.sign(
     { id },
-    process.env.JWT_SECRET || 'evora_jwt_secret_dev_super_safe_key_2026',
+    getJwtSecret(),
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 }
@@ -16,7 +17,7 @@ function generateToken(id) {
  */
 export async function register(req, res, next) {
   try {
-    const { name, email, password, role, profile } = req.body;
+    const { name, email, password, profile } = req.body;
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -30,7 +31,8 @@ export async function register(req, res, next) {
       name,
       email: email.toLowerCase(),
       password,
-      role: role === 'admin' ? 'admin' : 'user',
+      // Public registration must never grant elevated admin access.
+      role: 'user',
       profile: profile || {},
     });
 

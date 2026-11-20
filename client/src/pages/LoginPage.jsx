@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, LogIn, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +20,7 @@ export default function LoginPage() {
     try {
       const res = await login(email, password);
       if (res.success) {
-        navigate('/catalog');
+        navigate(location.state?.from || '/catalog', { replace: true });
       } else {
         setError(res.message || 'Login failed. Please check your credentials.');
       }
@@ -32,36 +33,23 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
+      <div className="page-enter aurora-glass w-full max-w-md space-y-6 rounded-3xl p-8 shadow-2xl transition duration-300 hover:shadow-xl">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center border border-emerald-500/30">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-aurora-violet/35 bg-aurora-violet/15 text-aurora-lime transition duration-300 hover:rotate-6 hover:scale-110">
             <Zap className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-extrabold text-white">Welcome Back</h2>
+          <h2 className="text-2xl font-extrabold text-aurora-text">Welcome Back</h2>
           <p className="text-xs text-slate-400">
             Sign in to access your personal EV preferences & wishlist
           </p>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-950/40 border border-red-500/30 rounded-xl text-red-400 text-xs">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
-
-        {/* Quick Demo Credentials Box */}
-        <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
-          <p className="font-semibold text-slate-300">Quick Test Credentials:</p>
-          <div className="flex justify-between">
-            <span>User: <code className="text-emerald-400">kuntali@evora.in</code></span>
-            <span>Pass: <code className="text-emerald-400">User@12345</code></span>
-          </div>
-          <div className="flex justify-between">
-            <span>Admin: <code className="text-amber-400">admin@evora.in</code></span>
-            <span>Pass: <code className="text-amber-400">Admin@12345</code></span>
-          </div>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div>
@@ -72,7 +60,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@domain.com"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+              className="w-full rounded-xl border border-aurora-border bg-aurora-base px-3.5 py-2.5 text-aurora-text placeholder-slate-500 transition duration-200 focus:border-aurora-violet focus:outline-none focus:ring-2 focus:ring-aurora-violet/20"
             />
           </div>
 
@@ -84,14 +72,14 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+              className="w-full rounded-xl border border-aurora-border bg-aurora-base px-3.5 py-2.5 text-aurora-text placeholder-slate-500 transition duration-200 focus:border-aurora-violet focus:outline-none focus:ring-2 focus:ring-aurora-violet/20"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold rounded-xl text-xs shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-aurora-violet py-3 text-xs font-bold text-white shadow-violet transition hover:brightness-110 disabled:opacity-50"
           >
             <LogIn className="w-4 h-4" />
             <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
@@ -100,7 +88,7 @@ export default function LoginPage() {
 
         <p className="text-center text-xs text-slate-400">
           Don't have an account yet?{' '}
-          <Link to="/register" className="text-emerald-400 hover:underline font-semibold">
+          <Link to="/register" state={location.state} className="font-semibold text-aurora-lime hover:underline">
             Create an account
           </Link>
         </p>

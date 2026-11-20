@@ -63,11 +63,15 @@ const evSchema = new mongoose.Schema(
         default: null,
       },
     },
+    priceVerifiedAt: { type: Date, default: null },
+    specsVerifiedAt: { type: Date, default: null },
+    dataSourceUrl: { type: String, default: null, trim: true },
     battery: {
       capacityKwh: { type: Number, default: null },
       chemistry: { type: String, default: null },
       warrantyYears: { type: Number, default: null },
       warrantyKm: { type: Number, default: null },
+      warrantyText: { type: String, default: null, trim: true },
     },
     performance: {
       powerBhp: { type: Number, default: null },
@@ -99,6 +103,7 @@ const evSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    imageProvidedByDataset: { type: Boolean, default: false },
     images: [
       {
         url: { type: String, required: true },
@@ -106,6 +111,9 @@ const evSchema = new mongoose.Schema(
         isPrimary: { type: Boolean, default: false },
       },
     ],
+    // Ordered, vehicle-specific exterior frames for the real drag-to-rotate viewer.
+    // Ordinary gallery photos must not be stored here as 360 frames.
+    view360Frames: [{ type: String }],
     // Flagship 360° visualizer support (Only 5-6 flagship EVs get full .glb 360 models)
     has360Model: {
       type: Boolean,

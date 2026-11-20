@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Zap, UserPlus, AlertCircle } from 'lucide-react';
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -51,7 +52,7 @@ export default function RegisterPage() {
       );
 
       if (res.success) {
-        navigate('/catalog');
+        navigate(location.state?.from || '/catalog', { replace: true });
       } else {
         setError(res.message || 'Registration failed.');
       }
@@ -64,19 +65,19 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-lg w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
+      <div className="aurora-glass w-full max-w-lg space-y-6 rounded-3xl p-8 shadow-2xl">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center border border-emerald-500/30">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-aurora-violet/35 bg-aurora-violet/15 text-aurora-lime">
             <Zap className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-extrabold text-white">Join EVora</h2>
+          <h2 className="text-2xl font-extrabold text-aurora-text">Join EVora</h2>
           <p className="text-xs text-slate-400">
             Create an account with your commute preferences for tailored AI recommendations
           </p>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-950/40 border border-red-500/30 rounded-xl text-red-400 text-xs">
+          <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -94,7 +95,7 @@ export default function RegisterPage() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Kuntali Jagtap"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text placeholder-slate-500 focus:outline-none focus:border-aurora-violet"
               />
             </div>
 
@@ -107,7 +108,7 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="kuntali@example.com"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text placeholder-slate-500 focus:outline-none focus:border-aurora-violet"
               />
             </div>
           </div>
@@ -122,13 +123,13 @@ export default function RegisterPage() {
               value={formData.password}
               onChange={handleChange}
               placeholder="••••••••"
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text placeholder-slate-500 focus:outline-none focus:border-aurora-violet"
             />
           </div>
 
           {/* Commute Preferences (Personalization Profile) */}
           <div className="pt-2 border-t border-slate-800 space-y-3">
-            <p className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-aurora-lime">
               Commute & Charging Profile
             </p>
 
@@ -141,7 +142,7 @@ export default function RegisterPage() {
                   value={formData.city}
                   onChange={handleChange}
                   placeholder="e.g. Pune, Mumbai"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text focus:outline-none focus:border-aurora-violet"
                 />
               </div>
 
@@ -154,7 +155,7 @@ export default function RegisterPage() {
                   name="dailyCommuteKm"
                   value={formData.dailyCommuteKm}
                   onChange={handleChange}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text focus:outline-none focus:border-aurora-violet font-mono"
                 />
               </div>
             </div>
@@ -166,7 +167,7 @@ export default function RegisterPage() {
                   name="preferredBodyType"
                   value={formData.preferredBodyType}
                   onChange={handleChange}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text focus:outline-none focus:border-aurora-violet"
                 >
                   <option value="SUV">SUV</option>
                   <option value="Sedan">Sedan</option>
@@ -185,12 +186,12 @@ export default function RegisterPage() {
                   name="familySize"
                   value={formData.familySize}
                   onChange={handleChange}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  className="w-full bg-white border border-aurora-border rounded-xl px-3 py-2 text-aurora-text focus:outline-none focus:border-aurora-violet font-mono"
                 />
               </div>
             </div>
 
-            <label className="flex items-center gap-2 p-2 bg-slate-950 rounded-xl border border-slate-800 cursor-pointer">
+            <label className="flex items-center gap-2 p-2 bg-white rounded-xl border border-aurora-border cursor-pointer">
               <input
                 type="checkbox"
                 name="homeCharging"
@@ -207,7 +208,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold rounded-xl text-xs shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 mt-4"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-aurora-violet py-3 text-xs font-bold text-white shadow-violet transition hover:brightness-110 disabled:opacity-50"
           >
             <UserPlus className="w-4 h-4" />
             <span>{loading ? 'Creating Profile...' : 'Complete Registration'}</span>
@@ -216,7 +217,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-xs text-slate-400">
           Already registered?{' '}
-          <Link to="/login" className="text-emerald-400 hover:underline font-semibold">
+          <Link to="/login" state={location.state} className="text-emerald-400 hover:underline font-semibold">
             Sign In here
           </Link>
         </p>

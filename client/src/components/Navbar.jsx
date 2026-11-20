@@ -3,15 +3,16 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   Zap,
+  House,
   Compass,
   Scale,
-  Sparkles,
-  MapPin,
+  MessageSquare,
   User as UserIcon,
   LogOut,
   LogIn,
   UserPlus,
   ShieldAlert,
+  Bot,
   Menu,
   X,
 } from 'lucide-react';
@@ -32,29 +33,22 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { label: 'Explore Catalog', path: '/catalog', icon: Compass },
-    { label: 'Compare EVs', path: '/compare', icon: Scale },
-    { label: 'AI Advisor', path: '/advisor', icon: Sparkles, highlight: true },
-    { label: 'Charging Map', path: '/stations', icon: MapPin },
+    { label: 'Home', path: '/', icon: House },
+    { label: 'Catalog', path: '/catalog', icon: Compass },
+    { label: 'Compare', path: '/compare', icon: Scale },
+    { label: 'AI Advisor', path: '/advisor', icon: MessageSquare },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+    <header className="sticky top-0 z-50 border-b border-aurora-border bg-aurora-base">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-              <Zap className="w-6 h-6 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-aurora-violet transition-transform group-hover:scale-105">
+              <Zap className="h-6 w-6 text-white" />
             </div>
-            <div>
-              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                EVora
-              </span>
-              <span className="text-[10px] block font-mono text-emerald-400/80 -mt-1 font-semibold tracking-wider">
-                AI ADVISOR
-              </span>
-            </div>
+            <span className="font-display text-xl font-bold tracking-tight text-aurora-text">EVora</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -67,19 +61,12 @@ export default function Navbar() {
                   to={link.path}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
                     isActive(link.path)
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                      : link.highlight
-                      ? 'text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      ? 'bg-aurora-raised text-aurora-text'
+                      : 'text-slate-300 hover:bg-aurora-raised hover:text-aurora-text'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${link.highlight ? 'text-cyan-400' : ''}`} />
+                  <Icon className="h-4 w-4" />
                   {link.label}
-                  {link.highlight && (
-                    <span className="text-[10px] bg-cyan-500/20 text-cyan-300 font-semibold px-1.5 py-0.5 rounded-full border border-cyan-500/30">
-                      GPT
-                    </span>
-                  )}
                 </Link>
               );
             })}
@@ -87,13 +74,14 @@ export default function Navbar() {
 
           {/* User Auth Section */}
           <div className="hidden md:flex items-center gap-3">
+            <button type="button" onClick={() => window.dispatchEvent(new Event('evora:open-advisor'))} className="evora-green-gradient inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-[0_7px_20px_rgba(20,160,88,.22)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(20,160,88,.32)]"><Bot className="h-4 w-4" />Ask EVora</button>
             {isAuthenticated ? (
               <div className="relative">
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition"
+                  className="flex items-center gap-2.5 rounded-xl border border-aurora-border bg-aurora-surface px-3 py-1.5 transition hover:border-aurora-violet/40"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm border border-emerald-500/30">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-aurora-violet/30 bg-aurora-violet/15 text-sm font-bold text-aurora-lime">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left text-xs">
@@ -104,7 +92,7 @@ export default function Navbar() {
 
                 {/* Dropdown Menu */}
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 z-50">
+                  <div className="aurora-glass absolute right-0 z-50 mt-2 w-56 rounded-xl py-2 shadow-2xl">
                     <div className="px-4 py-2 border-b border-slate-800">
                       <p className="text-xs text-slate-400">Signed in as</p>
                       <p className="text-sm font-semibold text-slate-200 truncate">{user?.email}</p>
@@ -113,7 +101,7 @@ export default function Navbar() {
                     <Link
                       to="/profile"
                       onClick={() => setProfileDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800"
+                      className="flex items-center gap-2.5 px-4 py-2 text-sm text-slate-300 hover:text-aurora-text hover:bg-aurora-raised"
                     >
                       <UserIcon className="w-4 h-4 text-emerald-400" />
                       Commute & Profile
@@ -123,7 +111,7 @@ export default function Navbar() {
                       <Link
                         to="/admin"
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-amber-300 hover:bg-slate-800"
+                        className="flex items-center gap-2.5 px-4 py-2 text-sm text-amber-700 hover:bg-aurora-raised"
                       >
                         <ShieldAlert className="w-4 h-4 text-amber-400" />
                         Admin Dashboard
@@ -146,14 +134,14 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent hover:border-slate-800 transition"
+                      className="flex items-center gap-1.5 rounded-lg border border-transparent px-3.5 py-1.5 text-sm font-medium text-slate-300 transition hover:border-aurora-border hover:bg-aurora-surface hover:text-aurora-text"
                 >
                   <LogIn className="w-4 h-4" />
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-slate-950 shadow-md shadow-emerald-500/20 transition"
+                  className="flex items-center gap-1.5 rounded-lg bg-aurora-violet px-3.5 py-1.5 text-sm font-semibold text-white shadow-violet transition hover:brightness-110"
                 >
                   <UserPlus className="w-4 h-4" />
                   Register
@@ -163,10 +151,11 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <button type="button" aria-label="Ask EVora" onClick={() => window.dispatchEvent(new Event('evora:open-advisor'))} className="evora-green-gradient inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-white shadow-sm"><Bot className="h-4 w-4" />Ask EVora</button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900"
+              className="p-2 rounded-lg text-slate-500 hover:text-aurora-text hover:bg-aurora-raised"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -176,7 +165,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-slate-950 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+        <div className="aurora-glass space-y-2 border-x-0 px-4 pb-4 pt-2 md:hidden">
           {navLinks.map((link) => {
             const Icon = link.icon;
             return (
@@ -186,11 +175,11 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
                   isActive(link.path)
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                    : 'text-slate-300 hover:bg-slate-900'
+                    ? 'bg-aurora-raised text-aurora-text'
+                    : 'text-slate-300 hover:bg-aurora-raised'
                 }`}
               >
-                <Icon className="w-5 h-5 text-emerald-400" />
+                <Icon className="h-5 w-5 text-aurora-violet" />
                 {link.label}
               </Link>
             );
@@ -202,7 +191,7 @@ export default function Navbar() {
                 <Link
                   to="/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-900 rounded-lg"
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-aurora-raised rounded-lg"
                 >
                   <UserIcon className="w-4 h-4 text-emerald-400" />
                   Profile & Preferences ({user?.name})
@@ -211,7 +200,7 @@ export default function Navbar() {
                   <Link
                     to="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-amber-400 hover:bg-slate-900 rounded-lg"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-amber-700 hover:bg-aurora-raised rounded-lg"
                   >
                     <ShieldAlert className="w-4 h-4" />
                     Admin Dashboard
@@ -230,7 +219,7 @@ export default function Navbar() {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium bg-slate-900 text-slate-200 rounded-lg border border-slate-800"
+                  className="flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium bg-white text-slate-200 rounded-lg border border-aurora-border"
                 >
                   <LogIn className="w-4 h-4" />
                   Sign In
@@ -238,7 +227,7 @@ export default function Navbar() {
                 <Link
                   to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-1 px-3 py-2 text-sm font-semibold bg-emerald-500 text-slate-950 rounded-lg"
+                  className="flex items-center justify-center gap-1 px-3 py-2 text-sm font-semibold bg-aurora-violet text-white rounded-lg"
                 >
                   <UserPlus className="w-4 h-4" />
                   Register

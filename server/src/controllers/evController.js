@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { EV } from '../models/EV.js';
 import { Brand } from '../models/Brand.js';
+import { Review } from '../models/Review.js';
 
 /**
  * @desc    Get all EVs with advanced filtering, full-text search, sorting, and pagination
@@ -91,7 +92,7 @@ export async function getEVs(req, res, next) {
 
     // 9. Flagship 360 Visualizer Filter
     if (has360 === 'true' || has360 === true) {
-      query.has360Model = true;
+      query['view360Frames.1'] = { $exists: true };
     }
 
     // 10. Sorting Strategy
@@ -185,6 +186,97 @@ export async function getEVById(req, res, next) {
   } catch (error) {
     next(error);
   }
+}
+
+/**
+ * @desc    Get a small set of published owner reviews for the homepage
+ * @route   GET /api/evs/reviews/featured
+ * @access  Public
+ */
+export async function getFeaturedReviews(req, res, next) {
+  try {
+    const requestedLimit = Number.parseInt(req.query.limit, 10) || 3;
+    const limit = Math.min(6, Math.max(1, requestedLimit));
+    const reviews = await Review.find({ moderationStatus: 'published' })
+      .populate({ path: 'evId', select: 'name imageUrl' })
+      .populate({ path: 'userId', select: 'name' })
+      .sort({ createdAt: -1, isVerifiedOwner: -1, helpfulCount: -1 })
+      .limit(limit)
+      .lean();
+
+    const data = reviews
+      .filter((review) => review.evId)
+      .map((review) => ({
+        _id: review._id,
+        title: review.title,
+        body: review.body,
+        rating: review.rating,
+        city: review.city,
+        monthsOwned: review.monthsOwned,
+        isVerifiedOwner: review.isVerifiedOwner,
+        author: review.userId?.name || 'EV owner',
+        ev: review.evId,
+      }));
+
+    res.status(200).json({ success: true, count: data.length, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * @desc    Compare two to four EVs by ID
+ * @route   GET /api/evs/compare?ids=id1,id2
+ * @access  Public
+ */
+export async function compareEVs(req, res, next) {
+  try {
+    const ids = typeof req.query.ids === 'string'
+      ? req.query.ids.split(',').map((id) => id.trim())
+      : [];
+
+    if (ids.length < 2 || ids.length > 4 || ids.some((id) => !mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Provide two to four valid EV IDs in the ids query parameter.',
+      });
+    }
+
+    if (new Set(ids).size !== ids.length) {
+      return res.status(400).json({ success: false, message: 'EV IDs must be unique.' });
+    }
+
+    const vehicles = await EV.find({ _id: { $in: ids } })
+      .populate('brandId', 'name logoUrl originCountry');
+    const vehiclesById = new Map(vehicles.map((ev) => [ev._id.toString(), ev]));
+    const orderedVehicles = ids.map((id) => vehiclesById.get(id)).filter(Boolean);
+
+    if (orderedVehicles.length !== ids.length) {
+      return res.status(404).json({ success: false, message: 'One or more vehicles were not found.' });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: orderedVehicles.length,
+      data: orderedVehicles,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getComparisonVariants(req, res, next) {
+  try {
+    const ids = typeof req.query.ids === 'string' ? req.query.ids.split(',').map((id) => id.trim()).filter((id) => mongoose.Types.ObjectId.isValid(id)).slice(0, 4) : [];
+    const selected = await EV.find({ _id: { $in: ids } }).select('name brandId variant price battery range').lean();
+    const data = await Promise.all(selected.map(async (ev) => {
+      const variants = await EV.find({ brandId: ev.brandId, name: ev.name })
+        .select('name variant price battery range charging performance dimensions')
+        .sort({ 'price.exShowroom': 1 }).lean();
+      return { evId: String(ev._id), name: ev.name, brandId: String(ev.brandId), variants };
+    }));
+    res.json({ success: true, data });
+  } catch (error) { next(error); }
 }
 
 /**

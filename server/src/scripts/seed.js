@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { randomBytes } from 'crypto';
 
 import {
   User,
@@ -106,7 +107,26 @@ const BRANDS_DATA = [
     description: 'French comfort focused on affordable urban electric motoring with Advanced Comfort suspension.',
     supportContact: '1800 267 1000',
   },
+  { name: 'Audi', originCountry: 'Germany', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Audi_logo_detail.svg', website: 'https://www.audi.in', description: 'German premium electric vehicles.' },
+  { name: 'Jaguar', originCountry: 'UK', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/58/Jaguar_2012_logo.svg', website: 'https://www.jaguar.in', description: 'British luxury electric vehicles.' },
+  { name: 'Maruti Suzuki', originCountry: 'Japan / India', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/12/Maruti_Suzuki_Logo.svg', website: 'https://www.marutisuzuki.com', description: 'Indian automotive manufacturer.' },
+  { name: 'Mini', originCountry: 'UK', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e9/Mini_logo.svg', website: 'https://www.mini.in', description: 'British compact car marque.' },
+  { name: 'Porsche', originCountry: 'Germany', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Porsche_Logo.svg', website: 'https://www.porsche.com/india', description: 'German performance vehicle manufacturer.' },
+  { name: 'Rolls-Royce', originCountry: 'UK', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Rolls-Royce_Motor_Cars_logo.svg', website: 'https://www.rolls-roycemotorcars.com', description: 'British luxury vehicle manufacturer.' },
+  { name: 'Smart', originCountry: 'Germany / China', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Smart_logo.svg', website: 'https://www.smart.com', description: 'Compact electric mobility brand.' },
+  { name: 'Toyota', originCountry: 'Japan', logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Toyota_carlogo.svg', website: 'https://www.toyotabharat.com', description: 'Japanese automotive manufacturer.' },
 ];
+
+const BRAND_ALIASES = {
+  tata: 'tata motors',
+  mg: 'mg motor',
+  mahindra: 'mahindra electric',
+  mercedes: 'mercedes-benz',
+};
+
+function normalizeBrandName(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
 
 // Sample public charging stations across India
 const CHARGING_STATIONS_DATA = [
@@ -437,6 +457,23 @@ function getHotspotsForVehicle(fullName) {
 }
 
 async function seed() {
+  const adminEmail = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ The destructive seed script cannot run when NODE_ENV=production.');
+    process.exitCode = 1;
+    return;
+  }
+  if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
+    console.error('❌ Seeding clears every collection. Set ALLOW_DESTRUCTIVE_SEED=true only for a disposable local database.');
+    process.exitCode = 1;
+    return;
+  }
+  if (!adminEmail || !/^\S+@\S+\.\S+$/.test(adminEmail) || !adminPassword || adminPassword.length < 12) {
+    console.error('❌ Set a valid SEED_ADMIN_EMAIL and a unique SEED_ADMIN_PASSWORD of at least 12 characters before seeding.');
+    process.exitCode = 1;
+    return;
+  }
   console.log('====================================================');
   console.log('🌱 Starting EVora Database Seed (Phase 1)');
   console.log('====================================================\n');
@@ -464,16 +501,16 @@ async function seed() {
     console.log('\n🏷️  Seeding Brands...');
     const insertedBrands = await Brand.insertMany(BRANDS_DATA);
     const brandMap = new Map();
-    insertedBrands.forEach((b) => brandMap.set(b.name.toLowerCase(), b._id));
+    insertedBrands.forEach((b) => brandMap.set(normalizeBrandName(b.name), b._id));
     console.log(`✅ Seeded ${insertedBrands.length} Brands.`);
 
-    // Step 3: Seed Users (Admin + regular test users)
+    // Step 3: Seed configured admin and demo profiles. Demo accounts receive random passwords.
     console.log('\n👥 Seeding Users...');
     const users = await User.create([
       {
         name: 'Admin EVora',
-        email: 'admin@evora.in',
-        password: 'Admin@12345',
+        email: adminEmail,
+        password: adminPassword,
         role: 'admin',
         profile: {
           city: 'Pune',
@@ -487,7 +524,7 @@ async function seed() {
       {
         name: 'Kuntali Jagtap',
         email: 'kuntali@evora.in',
-        password: 'User@12345',
+        password: randomBytes(32).toString('hex'),
         role: 'user',
         profile: {
           city: 'Pune',
@@ -501,7 +538,7 @@ async function seed() {
       {
         name: 'Rahul Sharma',
         email: 'rahul@evora.in',
-        password: 'User@12345',
+        password: randomBytes(32).toString('hex'),
         role: 'user',
         profile: {
           city: 'Mumbai',
@@ -515,7 +552,7 @@ async function seed() {
       {
         name: 'Ananya Deshmukh',
         email: 'ananya@evora.in',
-        password: 'User@12345',
+        password: randomBytes(32).toString('hex'),
         role: 'user',
         profile: {
           city: 'Bengaluru',
@@ -565,41 +602,34 @@ async function seed() {
     console.log(`📊 Successfully parsed ${rawEvs.length} vehicle rows from CSV.`);
 
     // Prepare EV documents with brand references, flagship 360 models, and hotspots
-    let flagshipCount = 0;
     const evDocuments = [];
 
     for (const item of rawEvs) {
-      // Find or assign brandId
-      let brandId = brandMap.get(item.brandName.toLowerCase());
+      const normalizedBrand = normalizeBrandName(item.brandName);
+      const mappedBrand = BRAND_ALIASES[normalizedBrand] || item.brandName;
+
+      let brandId = brandMap.get(normalizeBrandName(mappedBrand));
       if (!brandId) {
-        // Try fuzzy brand lookup
-        for (const [k, v] of brandMap.entries()) {
-          if (item.brandName.toLowerCase().includes(k) || k.includes(item.brandName.toLowerCase())) {
-            brandId = v;
-            break;
-          }
-        }
-      }
-      if (!brandId) {
-        // Default to first brand (Tata)
-        brandId = insertedBrands[0]._id;
+        // brand exists only in the CSV (global cars): create it instead of stopping the seed
+        const created = await Brand.create({
+          name: item.brandName,
+          originCountry: 'Unknown',
+          logoUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.brandName)}&background=0F766E&color=fff&size=128`,
+          description: `${item.brandName} electric vehicles.`,
+        });
+        brandId = created._id;
+        brandMap.set(normalizeBrandName(item.brandName), brandId);
+        console.log(`➕ Added brand from CSV: ${item.brandName}`);
       }
 
       // Check if flagship
-      const isFlagshipEv = item.has360Model;
-      if (isFlagshipEv) flagshipCount++;
-
-      const hotspots = isFlagshipEv ? getHotspotsForVehicle(item.name) : [];
+      const hotspots = [];
 
       evDocuments.push({
         ...item,
         brandId,
         hotspots360: hotspots,
-        images: [
-          { url: item.imageUrl, caption: `${item.name} Exterior Front`, isPrimary: true },
-          { url: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1000&q=80', caption: 'Rear Profile & Tail Lamps', isPrimary: false },
-          { url: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=80', caption: 'Interior Cockpit & Console', isPrimary: false },
-        ],
+        images: item.imageUrl ? [{ url: item.imageUrl, caption: `${item.name} exterior`, isPrimary: true }] : [],
         ratingAggregates: {
           averageRating: 0,
           totalReviews: 0,
@@ -617,7 +647,18 @@ async function seed() {
     }
 
     const insertedEvs = await EV.insertMany(evDocuments);
-    console.log(`✅ Seeded ${insertedEvs.length} EVs (${flagshipCount} Flagships with full 360° models and hotspots).`);
+    console.log(`✅ Seeded ${insertedEvs.length} EVs. No 360° imagery is assigned without a vehicle-specific asset manifest.`);
+    const evCountsByBrand = new Map(BRANDS_DATA.map((brand) => [brand.name, 0]));
+    const brandNameById = new Map(insertedBrands.map((brand) => [String(brand._id), brand.name]));
+    const nullPriceEvs = [];
+    for (const ev of evDocuments) {
+      const brandName = brandNameById.get(String(ev.brandId)) || 'Unknown';
+      evCountsByBrand.set(brandName, (evCountsByBrand.get(brandName) || 0) + 1);
+      if (ev.price.exShowroom === null) nullPriceEvs.push(`${ev.name} (${ev.variant})`);
+    }
+    console.log('\n📊 EVs per brand:');
+    for (const [brandName, count] of evCountsByBrand) console.log(`  ${brandName}: ${count}`);
+    console.log(`EVs with null price: ${nullPriceEvs.length ? nullPriceEvs.join(', ') : 'None'}`);
 
     // Step 6: Seed Rich Authentic Reviews & Atomically Update Rating Aggregates
     console.log('\n⭐ Seeding Verified Reviews and calculating rating aggregates...');
@@ -844,16 +885,16 @@ async function seed() {
     console.log('\n====================================================');
     console.log('🎉 PHASE 1 DATABASE SEED COMPLETED SUCCESSFULLY!');
     console.log(`- Brands: ${insertedBrands.length}`);
-    console.log(`- EVs: ${insertedEvs.length} (${flagshipCount} Flagships with full 360° models)`);
+    console.log(`- EVs: ${insertedEvs.length} (360° image sequences require vehicle-specific manifests)`);
     console.log(`- Users: ${users.length}`);
     console.log(`- Charging Stations: ${insertedStations.length}`);
     console.log(`- Reviews: ${insertedReviews.length}`);
     console.log('====================================================\n');
   } catch (error) {
     console.error('❌ Seeding failed with error:', error);
+    process.exitCode = 1;
   } finally {
     await mongoose.disconnect();
-    process.exit(0);
   }
 }
 

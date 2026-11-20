@@ -79,10 +79,12 @@ const reviewSchema = new mongoose.Schema(
     },
     moderationStatus: {
       type: String,
-      enum: ['published', 'hidden', 'flagged'],
+      enum: ['pending', 'published', 'hidden', 'flagged'],
       default: 'published',
       index: true,
     },
+    moderationNote: { type: String, default: '', maxlength: 300 },
+    moderatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   },
   { timestamps: true }
 );

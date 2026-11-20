@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, RotateCcw, Rotate3d, SlidersHorizontal } from 'lucide-react';
+import { Search, RotateCcw, SlidersHorizontal } from 'lucide-react';
 
 export default function FilterSidebar({
   filters,
@@ -36,16 +36,16 @@ export default function FilterSidebar({
   const currentBodyTypes = filters.bodyType ? filters.bodyType.split(',') : [];
 
   return (
-    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-6 text-sm">
+    <div className="aurora-glass space-y-6 rounded-2xl p-5 text-sm">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-        <div className="flex items-center gap-2 font-bold text-white">
-          <SlidersHorizontal className="w-4 h-4 text-emerald-400" />
+      <div className="flex items-center justify-between border-b border-aurora-border pb-3">
+        <div className="flex items-center gap-2 font-bold text-aurora-text">
+          <SlidersHorizontal className="h-4 w-4 text-aurora-violet" />
           <span>Catalog Filters</span>
         </div>
         <button
           onClick={onReset}
-          className="flex items-center gap-1 text-xs text-slate-400 hover:text-emerald-400 transition"
+          className="flex items-center gap-1 text-xs text-slate-400 transition hover:text-aurora-lime"
         >
           <RotateCcw className="w-3 h-3" />
           <span>Reset</span>
@@ -64,27 +64,9 @@ export default function FilterSidebar({
             placeholder="e.g. Nexon, Seal, 500km..."
             value={filters.search || ''}
             onChange={(e) => onChange('search', e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+            className="w-full rounded-xl border border-aurora-border bg-aurora-base py-2 pl-9 pr-3 text-xs text-aurora-text placeholder-slate-500 transition focus:border-aurora-violet focus:outline-none"
           />
         </div>
-      </div>
-
-      {/* 360° Visualizer Flagship Toggle */}
-      <div className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-800/40">
-        <label className="flex items-center justify-between cursor-pointer">
-          <div className="flex items-center gap-2">
-            <Rotate3d className="w-4 h-4 text-cyan-400" />
-            <span className="text-xs font-semibold text-cyan-200">
-              360° Virtual Models Only
-            </span>
-          </div>
-          <input
-            type="checkbox"
-            checked={Boolean(filters.has360)}
-            onChange={(e) => onChange('has360', e.target.checked)}
-            className="w-4 h-4 accent-cyan-500 rounded cursor-pointer"
-          />
-        </label>
       </div>
 
       {/* Max Budget Slider */}
@@ -93,7 +75,7 @@ export default function FilterSidebar({
           <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
             Max Budget
           </label>
-          <span className="text-xs font-mono font-bold text-emerald-400">
+          <span className="font-mono text-xs font-bold text-aurora-lime">
             {filters.maxPrice
               ? `₹${(filters.maxPrice / 100000).toFixed(1)} Lakh`
               : 'Any Budget'}
@@ -106,9 +88,9 @@ export default function FilterSidebar({
           step="100000"
           value={filters.maxPrice || 8000000}
           onChange={(e) => onChange('maxPrice', Number(e.target.value))}
-          className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-aurora-raised accent-violet-500"
         />
-        <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+        <div className="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
           <span>₹8L</span>
           <span>₹40L</span>
           <span>₹80L+</span>
@@ -121,7 +103,7 @@ export default function FilterSidebar({
           <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
             Min Claimed Range
           </label>
-          <span className="text-xs font-mono font-bold text-cyan-400">
+          <span className="font-mono text-xs font-bold text-aurora-blue">
             {filters.minRange ? `${filters.minRange} km+` : 'Any'}
           </span>
         </div>
@@ -132,9 +114,9 @@ export default function FilterSidebar({
           step="25"
           value={filters.minRange || 200}
           onChange={(e) => onChange('minRange', Number(e.target.value))}
-          className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+          className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-aurora-raised accent-blue-500"
         />
-        <div className="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+        <div className="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
           <span>200 km</span>
           <span>450 km</span>
           <span>700 km</span>
@@ -156,8 +138,8 @@ export default function FilterSidebar({
                 onClick={() => handleBodyTypeToggle(type)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                   isSelected
-                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                    : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
+                    ? 'bg-aurora-violet font-bold text-white shadow-violet'
+                    : 'border border-aurora-border bg-aurora-base text-slate-300 hover:text-aurora-text'
                 }`}
               >
                 {type}
@@ -178,7 +160,7 @@ export default function FilterSidebar({
             return (
               <label
                 key={b._id}
-                className="flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-950 cursor-pointer text-xs"
+                className="flex cursor-pointer items-center justify-between rounded-lg p-1.5 text-xs hover:bg-aurora-raised/60"
               >
                 <div className="flex items-center gap-2 text-slate-300">
                   <input
@@ -189,7 +171,7 @@ export default function FilterSidebar({
                   />
                   <span>{b.name}</span>
                 </div>
-                <span className="text-[10px] text-slate-500 font-mono">
+                <span className="text-[11px] text-slate-500 font-mono">
                   {b.activeEvCount || ''}
                 </span>
               </label>
@@ -211,8 +193,8 @@ export default function FilterSidebar({
               onClick={() => onChange('seats', filters.seats === String(s) ? '' : String(s))}
               className={`py-1.5 rounded-lg text-xs font-medium border text-center transition ${
                 filters.seats === String(s)
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
-                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                  ? 'border-aurora-lime/35 bg-aurora-lime/10 text-aurora-lime'
+                  : 'border-aurora-border bg-aurora-base text-slate-300 hover:border-aurora-violet/40'
               }`}
             >
               {s} Seats

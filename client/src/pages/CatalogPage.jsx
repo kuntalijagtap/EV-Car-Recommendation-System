@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import EVCard from '../components/EVCard';
 import FilterSidebar from '../components/FilterSidebar';
@@ -11,16 +12,19 @@ import {
   RotateCcw,
   Layers,
   ArrowUpDown,
+  X,
 } from 'lucide-react';
+import { getVehicleImage } from '../services/vehicleImage';
 
 export default function CatalogPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [evs, setEvs] = useState([]);
   const [metadata, setMetadata] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [compareIds, setCompareIds] = useState([]);
+  const [compareCars, setCompareCars] = useState({});
 
   // Parse filter state from URL search params
   const filters = {
@@ -31,7 +35,6 @@ export default function CatalogPage() {
     maxPrice: searchParams.get('maxPrice') || '',
     minRange: searchParams.get('minRange') || '',
     seats: searchParams.get('seats') || '',
-    has360: searchParams.get('has360') === 'true',
     sortBy: searchParams.get('sortBy') || 'rating_desc',
     page: parseInt(searchParams.get('page') || '1', 10),
   };
@@ -64,7 +67,6 @@ export default function CatalogPage() {
         if (filters.maxPrice) params.maxPrice = filters.maxPrice;
         if (filters.minRange) params.minRange = filters.minRange;
         if (filters.seats) params.seats = filters.seats;
-        if (filters.has360) params.has360 = true;
         if (filters.sortBy) params.sortBy = filters.sortBy;
         params.page = filters.page;
         params.limit = 12;
@@ -72,7 +74,6 @@ export default function CatalogPage() {
         const res = await api.get('/evs', { params });
         if (res.data.success) {
           setEvs(res.data.data);
-          setTotalCount(res.data.totalCount);
           setTotalPages(res.data.totalPages);
         }
       } catch (err) {
@@ -109,44 +110,52 @@ export default function CatalogPage() {
     }
   };
 
+  const toggleCompare = (evId, ev) => {
+    if (compareIds.includes(evId)) {
+      setCompareIds((current) => current.filter((id) => id !== evId));
+      setCompareCars((items) => { const next = { ...items }; delete next[evId]; return next; });
+      return;
+    }
+    if (compareIds.length >= 4) return;
+    setCompareIds((current) => [...current, evId]);
+    setCompareCars((items) => ({ ...items, [evId]: ev }));
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 ${compareIds.length ? 'pb-32' : 'pb-8'} space-y-6`}>
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl font-extrabold text-aurora-text tracking-tight">
             Electric Vehicle Catalog
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Showing <strong className="text-emerald-400">{totalCount}</strong> verified models available in India
-          </p>
         </div>
 
         {/* Sort & Mobile filter trigger */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            className="md:hidden flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-200"
+            className="md:hidden flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-aurora-border text-xs font-semibold text-aurora-text"
           >
             <SlidersHorizontal className="w-4 h-4 text-emerald-400" />
             <span>Filters</span>
           </button>
 
           {/* Sort Dropdown */}
-          <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300">
+          <div className="flex items-center gap-2 bg-white border border-aurora-border rounded-xl px-3 py-1.5 text-xs text-slate-300">
             <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
             <span className="text-slate-400 hidden sm:inline">Sort:</span>
             <select
               value={filters.sortBy}
               onChange={(e) => updateFilter('sortBy', e.target.value)}
-              className="bg-transparent text-white font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-aurora-text font-medium focus:outline-none cursor-pointer"
             >
-              <option value="rating_desc" className="bg-slate-900 text-white">Top Rated First</option>
-              <option value="price_asc" className="bg-slate-900 text-white">Price: Low to High</option>
-              <option value="price_desc" className="bg-slate-900 text-white">Price: High to Low</option>
-              <option value="range_desc" className="bg-slate-900 text-white">Highest Claimed Range</option>
-              <option value="views_desc" className="bg-slate-900 text-white">Most Popular</option>
-              <option value="newest" className="bg-slate-900 text-white">Latest Models</option>
+              <option value="rating_desc" className="bg-white text-aurora-text">Top Rated First</option>
+              <option value="price_asc" className="bg-white text-aurora-text">Price: Low to High</option>
+              <option value="price_desc" className="bg-white text-aurora-text">Price: High to Low</option>
+              <option value="range_desc" className="bg-white text-aurora-text">Highest Claimed Range</option>
+              <option value="views_desc" className="bg-white text-aurora-text">Most Popular</option>
+              <option value="newest" className="bg-white text-aurora-text">Latest Models</option>
             </select>
           </div>
         </div>
@@ -166,11 +175,11 @@ export default function CatalogPage() {
 
         {/* Mobile Filter Drawer */}
         {mobileFilterOpen && (
-          <div className="md:hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto">
+          <div className="md:hidden fixed inset-0 z-50 bg-aurora-base/95 p-4 overflow-y-auto">
             <div className="flex justify-end mb-2">
               <button
                 onClick={() => setMobileFilterOpen(false)}
-                className="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-bold"
+                className="px-4 py-2 bg-aurora-raised text-aurora-text rounded-lg text-xs font-bold"
               >
                 Close Filters
               </button>
@@ -194,21 +203,21 @@ export default function CatalogPage() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-96 rounded-2xl bg-slate-900/60 animate-pulse border border-slate-800" />
+                <div key={i} className="h-96 rounded-2xl bg-aurora-raised animate-pulse border border-aurora-border" />
               ))}
             </div>
           ) : evs.length === 0 ? (
-            <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-12 text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-slate-800 text-slate-400 mx-auto flex items-center justify-center">
+            <div className="bg-white border border-aurora-border rounded-3xl p-12 text-center space-y-4">
+              <div className="w-12 h-12 rounded-full bg-aurora-raised text-slate-400 mx-auto flex items-center justify-center">
                 <SlidersHorizontal className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-white">No Electric Vehicles Match Your Criteria</h3>
+              <h3 className="text-lg font-bold text-aurora-text">No Electric Vehicles Match Your Criteria</h3>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
                 Try widening your price range, claimed range slider, or clearing the manufacturer filters.
               </p>
               <button
                 onClick={handleReset}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-aurora-violet text-white font-bold text-xs shadow-md"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset All Filters</span>
@@ -217,7 +226,13 @@ export default function CatalogPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {evs.map((ev) => (
-                <EVCard key={ev._id} ev={ev} />
+                <EVCard
+                  key={ev._id}
+                  ev={ev}
+                  onToggleCompare={(id) => toggleCompare(id, ev)}
+                  isCompared={compareIds.includes(ev._id)}
+                  compareDisabled={compareIds.length >= 4 && !compareIds.includes(ev._id)}
+                />
               ))}
             </div>
           )}
@@ -228,20 +243,20 @@ export default function CatalogPage() {
               <button
                 onClick={() => handlePageChange(filters.page - 1)}
                 disabled={filters.page <= 1}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-aurora-border text-slate-300 hover:text-aurora-text disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>Previous</span>
               </button>
 
               <span className="text-slate-400 font-medium">
-                Page <strong className="text-white">{filters.page}</strong> of <strong className="text-white">{totalPages}</strong>
+                Page <strong className="text-aurora-text">{filters.page}</strong> of <strong className="text-aurora-text">{totalPages}</strong>
               </span>
 
               <button
                 onClick={() => handlePageChange(filters.page + 1)}
                 disabled={filters.page >= totalPages}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-aurora-border text-slate-300 hover:text-aurora-text disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <span>Next</span>
                 <ChevronRight className="w-4 h-4" />
@@ -250,6 +265,12 @@ export default function CatalogPage() {
           )}
         </div>
       </div>
+      {compareIds.length > 0 && <div className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 rounded-2xl border border-emerald-900/10 bg-white/95 p-3 shadow-[0_18px_55px_rgba(15,23,42,.18)] backdrop-blur-xl sm:px-5">
+          <div className="flex min-w-0 items-center gap-3"><span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 sm:flex"><Layers className="h-5 w-5" /></span><div className="min-w-0"><p className="text-sm font-bold text-slate-900">{compareIds.length} EV{compareIds.length === 1 ? '' : 's'} selected</p><div className="mt-1 flex max-w-[55vw] gap-2 overflow-hidden">{compareIds.map((id) => { const car = compareCars[id]; const image = getVehicleImage(car); return <span key={id} className="inline-flex max-w-40 items-center gap-1.5 rounded-full bg-slate-100 py-1 pl-1 pr-2 text-[11px] font-medium text-slate-600">{image ? <img src={image} alt="" className="h-5 w-7 rounded-full object-cover" /> : <span className="h-5 w-7 rounded-full bg-gradient-to-br from-emerald-200 to-green-500" />}<span className="truncate">{car?.name || 'EV selected'}</span></span>; })}</div></div></div>
+          <div className="flex shrink-0 items-center gap-2"><button type="button" onClick={() => { setCompareIds([]); setCompareCars({}); }} className="hidden rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 sm:inline-flex">Clear</button><Link to={compareIds.length >= 2 ? `/compare?ids=${compareIds.join(',')}` : '/compare'} className="evora-green-gradient inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white shadow-[0_8px_20px_rgba(20,160,88,.25)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(20,160,88,.32)]">Compare {compareIds.length >= 2 && `(${compareIds.length})`} <ArrowUpDown className="h-4 w-4" /></Link><button type="button" aria-label="Clear selected cars" onClick={() => { setCompareIds([]); setCompareCars({}); }} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 sm:hidden"><X className="h-4 w-4" /></button></div>
+        </div>
+      </div>}
     </div>
   );
 }

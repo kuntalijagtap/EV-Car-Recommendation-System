@@ -1,0 +1,10 @@
+factor,level,multiplier,source
+driving_style,Eco,1.08,from data
+driving_style,Normal,1.0,from data
+driving_style,Sport,0.9,from data
+traffic_condition,Free,1.23,from data
+traffic_condition,Heavy,0.82,from data
+traffic_condition,Moderate,1.0,from data
+terrain_type,Flat,1.0,assumption
+terrain_type,Mild hills,0.92,assumption
+terrain_type,Hilly,0.82,assumption

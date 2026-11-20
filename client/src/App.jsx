@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import AdvisorDrawer from './components/AdvisorDrawer';
 
 import HomePage from './pages/HomePage';
 import CatalogPage from './pages/CatalogPage';
@@ -35,7 +36,7 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+        <div className="aurora-grid-bg min-h-screen flex flex-col bg-aurora-base text-aurora-text font-sans">
           <Navbar />
           <main className="flex-1">
             <Routes>
@@ -67,6 +68,7 @@ export default function App() {
             </Routes>
           </main>
           <Footer />
+          <AdvisorDrawer />
         </div>
       </Router>
     </AuthProvider>

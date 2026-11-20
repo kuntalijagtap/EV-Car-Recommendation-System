@@ -2,10 +2,157 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --evora-page-rgb: 245 248 252;
+  --evora-card-rgb: 255 255 255;
+  --evora-raised-rgb: 236 241 248;
+  --evora-ink-rgb: 15 23 42;
+  --evora-muted-rgb: 71 85 105;
+  --evora-primary-rgb: 21 128 61;
+  --evora-secondary-rgb: 22 163 74;
+  --evora-border: rgba(15, 23, 42, 0.1);
+  --evora-warning-rgb: 146 64 14;
+  --evora-danger-rgb: 185 28 28;
+}
+
 @layer base {
-  body {
-    @apply bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-white;
+  html {
+    font-size: 16px;
   }
+
+  body {
+    @apply bg-aurora-base text-aurora-text font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+  }
+
+  ::selection {
+    background: rgb(var(--evora-primary-rgb) / 0.2);
+    color: rgb(var(--evora-ink-rgb));
+  }
+}
+
+.aurora-grid-bg {
+  background-color: rgb(var(--evora-page-rgb));
+  background-image:
+    radial-gradient(ellipse at 7% 4%, rgb(34 197 94 / 0.075), transparent 32rem),
+    radial-gradient(ellipse at 94% 18%, rgb(16 185 129 / 0.055), transparent 28rem);
+  background-attachment: fixed;
+}
+
+.evora-green-gradient {
+  background-image: linear-gradient(112deg, #19a95e 0%, #23bd6b 47%, #0d8b52 100%);
+}
+
+.bg-aurora-violet,
+.bg-emerald-700,
+.bg-emerald-600 {
+  background-image: linear-gradient(112deg, #19a95e 0%, #23bd6b 47%, #0d8b52 100%);
+}
+
+.bg-aurora-violet:hover,
+.bg-emerald-700:hover,
+.bg-emerald-600:hover {
+  filter: brightness(0.96) saturate(1.08);
+}
+
+.compare-hero {
+  background:
+    radial-gradient(ellipse at 10% 80%, rgb(125 211 252 / 0.20), transparent 38%),
+    radial-gradient(ellipse at 88% 18%, rgb(74 222 128 / 0.22), transparent 38%),
+    linear-gradient(115deg, #effcf6 0%, #ffffff 48%, #f0faf5 100%);
+}
+
+.aurora-glass {
+  border: 1px solid var(--evora-border);
+  background: rgb(var(--evora-card-rgb));
+  box-shadow: 0 2px 8px rgb(var(--evora-ink-rgb) / 0.06);
+}
+
+.aurora-glass:hover {
+  border-color: rgb(var(--evora-primary-rgb) / 0.35);
+}
+
+@keyframes evora-home-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-enter {
+  animation: evora-home-enter 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.home-enter-delay-1 {
+  animation-delay: 100ms;
+}
+
+.home-enter-delay-2 {
+  animation-delay: 180ms;
+}
+
+.home-enter-delay-3 {
+  animation-delay: 260ms;
+}
+
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 650ms ease, transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes evora-page-enter {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes evora-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes evora-drawer-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes evora-message-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-enter { animation: evora-page-enter 500ms cubic-bezier(0.2, 0.75, 0.25, 1) both; }
+.advisor-backdrop { animation: evora-backdrop-in 180ms ease-out both; }
+.advisor-drawer { animation: evora-drawer-in 280ms cubic-bezier(0.2, 0.75, 0.25, 1) both; }
+.chat-message-in { animation: evora-message-in 220ms ease-out both; }
+.admin-card { transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease; }
+.admin-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgb(var(--evora-ink-rgb) / 0.07); }
+
+input, select, textarea, button, a { -webkit-tap-highlight-color: transparent; }
+button, a { transition-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-enter,
+  .home-enter-delay-1,
+  .home-enter-delay-2,
+  .home-enter-delay-3 {
+    animation: none;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .page-enter, .advisor-backdrop, .advisor-drawer, .chat-message-in { animation: none; }
+  .admin-card { transition: none; }
+  .aurora-grid-bg { background-attachment: scroll; }
 }
 
 /* Custom scrollbars */
@@ -15,14 +162,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: rgb(var(--evora-raised-rgb));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: rgb(var(--evora-muted-rgb) / 0.35);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: rgb(var(--evora-primary-rgb) / 0.65);
 }

@@ -1,12 +1,14 @@
 import dotenv from 'dotenv';
 import app from './app.js';
 import { connectDB } from './config/db.js';
+import { getJwtSecret } from './config/jwt.js';
 
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
+  getJwtSecret();
   await connectDB();
 
   app.listen(PORT, () => {
@@ -15,4 +17,7 @@ async function startServer() {
   });
 }
 
-startServer();
+startServer().catch((error) => {
+  console.error(`❌ Server startup failed: ${error.message}`);
+  process.exit(1);
+});
